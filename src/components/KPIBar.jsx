@@ -11,6 +11,7 @@ export default function KPIBar() {
   return (
     <section className="bg-neutral-950 text-white border-t border-white/10">
       <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-4">
+        
         {kpis.map((k, i) => (
           <div key={i} className="rounded-2xl border border-white/10 p-4 bg-white/5">
             <div className="text-neutral-400 text-xs">{k.label}</div>
