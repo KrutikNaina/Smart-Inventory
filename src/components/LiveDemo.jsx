@@ -18,9 +18,7 @@ export default function LiveDemo() {
 
     return (
         <section className="bg-neutral-950 text-white border-t border-white/10">
-            <div className="bg-grid" />
-            <div className="bg-glow" />
-
+        
             <div className="max-w-7xl mx-auto px-6 py-16 grid lg:grid-cols-2 gap-10 items-center">
                 {/* Left Side */}
                 <div>
