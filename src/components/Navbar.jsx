@@ -1,8 +1,15 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import LoginModal from "./auth/LoginModal";
 
 export default function Navbar() {
   const [loginOpen, setLoginOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLoginSuccess = () => {
+    setLoginOpen(false);
+    navigate("/dashboard");
+  };
 
   return (
     <>
@@ -24,7 +31,11 @@ export default function Navbar() {
       </header>
 
       {/* Login modal */}
-      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
+      <LoginModal
+        open={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        onContinue={handleLoginSuccess} // 👈 Pass success callback
+      />
     </>
   );
 }
