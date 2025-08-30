@@ -1,5 +1,6 @@
 // src/pages/Reports.jsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Download, Package, AlertTriangle, ClipboardList } from "lucide-react";
 import {
   LineChart,
@@ -12,6 +13,8 @@ import {
 } from "recharts";
 
 export default function Reports() {
+  const navigate = useNavigate();
+
   // Dummy chart data
   const data = [
     { month: "Jan", inventory: 120, orders: 40 },
@@ -22,21 +25,25 @@ export default function Reports() {
     { month: "Jun", inventory: 95, orders: 65 },
   ];
 
+  // Summary cards with route paths
   const summary = [
     {
       title: "Total Items",
       value: "1,240",
       icon: <Package className="h-6 w-6 text-emerald-400" />,
+      route: "/inventory",
     },
     {
       title: "Low Stock",
       value: "18",
       icon: <AlertTriangle className="h-6 w-6 text-yellow-400" />,
+      route: "/inventory?filter=low",
     },
     {
       title: "Orders Processed",
       value: "320",
       icon: <ClipboardList className="h-6 w-6 text-blue-400" />,
+      route: "/orders",
     },
   ];
 
@@ -57,7 +64,8 @@ export default function Reports() {
         {summary.map((item, idx) => (
           <div
             key={idx}
-            className="p-4 bg-neutral-900 border border-white/10 rounded-xl flex items-center gap-4"
+            onClick={() => navigate(item.route)}
+            className="p-4 bg-neutral-900 border border-white/10 rounded-xl flex items-center gap-4 cursor-pointer hover:bg-white/10 transition"
           >
             <div className="p-3 rounded-lg bg-neutral-800">{item.icon}</div>
             <div>

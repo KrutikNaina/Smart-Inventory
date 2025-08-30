@@ -123,46 +123,46 @@ export default function Orders() {
 
         {/* QR Scanner Modal */}
         {scanOpen && (
-  <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 px-4 sm:px-6">
-    <div className="bg-neutral-900 rounded-2xl border border-white/10 p-4 sm:p-6 relative w-full max-w-md sm:max-w-lg shadow-xl">
-      {/* Close Button */}
-      <button
-        onClick={() => setScanOpen(false)}
-        className="absolute top-3 right-3 text-neutral-400 hover:text-white text-xl sm:text-2xl"
-      >
-        ✕
-      </button>
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 px-4 sm:px-6">
+            <div className="bg-neutral-900 rounded-2xl border border-white/10 p-4 sm:p-6 relative w-full max-w-md sm:max-w-lg shadow-xl">
+              {/* Close Button */}
+              <button
+                onClick={() => setScanOpen(false)}
+                className="absolute top-3 right-3 text-neutral-400 hover:text-white text-xl sm:text-2xl"
+              >
+                ✕
+              </button>
 
-      {/* Title */}
-      <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center sm:text-left">
-        Scan Order QR/Barcode
-      </h2>
+              {/* Title */}
+              <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center sm:text-left">
+                Scan Order QR/Barcode
+              </h2>
 
-      {/* QR Scanner */}
-      <div className="overflow-hidden rounded-xl border border-white/10">
-        <BarcodeScannerComponent
-          width={"100%"}
-          height={250}
-          onUpdate={(err, result) => {
-            if (result) setScannedCode(result.text);
-          }}
-        />
-      </div>
+              {/* QR Scanner */}
+              <div className="overflow-hidden rounded-xl border border-white/10">
+                <BarcodeScannerComponent
+                  width={"100%"}
+                  height={250}
+                  onUpdate={(err, result) => {
+                    if (result) setScannedCode(result.text);
+                  }}
+                />
+              </div>
 
-      {/* Scanned Result */}
-      {scannedCode && (
-        <div className="mt-4 p-3 sm:p-4 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-sm sm:text-base text-center flex flex-col items-center gap-1 break-all">
-  <span className="text-emerald-400 font-semibold">✅ Scanned Code</span>
-  <span className="font-mono text-white bg-neutral-900 px-2 py-1 rounded text-sm sm:text-base break-all">
-    {scannedCode}
-  </span>
-</div>
-
-      )}
-    </div>
-  </div>
-)}
-
+              {/* Scanned Result */}
+              {scannedCode && (
+                <div className="mt-4 p-3 sm:p-4 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-sm sm:text-base text-center flex flex-col items-center gap-1 break-all">
+                  <span className="text-emerald-400 font-semibold">
+                    ✅ Scanned Code
+                  </span>
+                  <span className="font-mono text-white bg-neutral-900 px-2 py-1 rounded text-sm sm:text-base break-all">
+                    {scannedCode}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

@@ -1,11 +1,11 @@
-// src/components/Sidebar.jsx
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
-  Boxes,
-  ClipboardList,
-  Shield,
+  Boxes, // Inventory
+  FileText, // Reports
+  ClipboardList, // Orders
+  Shield, // Admin Panel
   LogOut,
 } from "lucide-react";
 
@@ -64,7 +64,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
             className={navLinkClasses}
             onClick={() => setIsOpen(false)}
           >
-            <Boxes className="h-5 w-5" /> Reports
+            <FileText className="h-5 w-5" /> Reports
           </NavLink>
           <NavLink
             to="/orders"
