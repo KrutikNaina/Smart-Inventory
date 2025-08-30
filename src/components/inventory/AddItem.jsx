@@ -1,0 +1,153 @@
+import React, { useState } from "react";
+import { PlusCircle } from "lucide-react";
+
+export default function AddItem() {
+  const [form, setForm] = useState({
+    name: "",
+    category: "",
+    quantity: "",
+    status: "Available",
+    location: "",
+    description: "",
+  });
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("New Item Added:", form);
+    alert("✅ Item Added Successfully!");
+  };
+
+  return (
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <PlusCircle className="h-7 w-7 text-emerald-400" />
+        <h1 className="text-2xl font-bold text-white tracking-tight">
+          Add New Item
+        </h1>
+      </div>
+
+      {/* Form Card */}
+      <form
+        onSubmit={handleSubmit}
+        className="bg-neutral-900 border border-white/10 rounded-xl p-6 space-y-6"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Item Name */}
+          <div>
+            <label className="block text-sm font-medium text-neutral-300 mb-1">
+              Item Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              placeholder="Enter item name"
+              className="w-full px-4 py-2 rounded-lg bg-neutral-800 text-white border border-white/10 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+              required
+            />
+          </div>
+
+          {/* Category */}
+          <div>
+            <label className="block text-sm font-medium text-neutral-300 mb-1">
+              Category
+            </label>
+            <select
+              name="category"
+              value={form.category}
+              onChange={handleChange}
+              className="w-full px-4 py-2 rounded-lg bg-neutral-800 text-white border border-white/10 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+              required
+            >
+              <option value="">Select category</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Furniture">Furniture</option>
+              <option value="Stationery">Stationery</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          {/* Quantity */}
+          <div>
+            <label className="block text-sm font-medium text-neutral-300 mb-1">
+              Quantity
+            </label>
+            <input
+              type="number"
+              name="quantity"
+              value={form.quantity}
+              onChange={handleChange}
+              placeholder="Enter quantity"
+              className="w-full px-4 py-2 rounded-lg bg-neutral-800 text-white border border-white/10 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+              required
+            />
+          </div>
+
+          {/* Status */}
+          <div>
+            <label className="block text-sm font-medium text-neutral-300 mb-1">
+              Status
+            </label>
+            <select
+              name="status"
+              value={form.status}
+              onChange={handleChange}
+              className="w-full px-4 py-2 rounded-lg bg-neutral-800 text-white border border-white/10 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+            >
+              <option value="Available">Available</option>
+              <option value="Checked Out">Checked Out</option>
+              <option value="Under Maintenance">Under Maintenance</option>
+              <option value="Low Stock">Low Stock</option>
+            </select>
+          </div>
+
+          {/* Location */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-neutral-300 mb-1">
+              Location
+            </label>
+            <input
+              type="text"
+              name="location"
+              value={form.location}
+              onChange={handleChange}
+              placeholder="Enter item location"
+              className="w-full px-4 py-2 rounded-lg bg-neutral-800 text-white border border-white/10 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+            />
+          </div>
+
+          {/* Description */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-neutral-300 mb-1">
+              Description
+            </label>
+            <textarea
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              placeholder="Enter item description"
+              rows="4"
+              className="w-full px-4 py-2 rounded-lg bg-neutral-800 text-white border border-white/10 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+            ></textarea>
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            className="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg transition"
+          >
+            Add Item
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}

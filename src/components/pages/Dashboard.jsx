@@ -1,4 +1,3 @@
-// src/pages/Dashboard.jsx
 import React from "react";
 import {
   ShoppingCart,
@@ -38,23 +37,13 @@ export default function Dashboard() {
   return (
     <div className="flex min-h-screen bg-neutral-950 text-white">
       {/* Sidebar */}
-      <Sidebar />
+      
 
       {/* Main Content */}
       <main className="flex-1 relative overflow-hidden">
         {/* Glow */}
         <div className="absolute top-1/3 left-1/2 w-[400px] md:w-[600px] h-[400px] md:h-[600px] -translate-x-1/2 rounded-full bg-emerald-500/10 blur-[120px]" />
 
-        {/* Sticky Header */}
-        <header className="sticky top-0 z-40 backdrop-blur border-b border-white/10 bg-neutral-950/60">
-          <nav className="px-4 md:px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600" />
-              <span className="text-white font-bold tracking-tight">SmartInventory</span>
-            </div>
-            <div className="text-xs sm:text-sm text-neutral-300">Welcome back, Admin</div>
-          </nav>
-        </header>
 
         {/* Page Content */}
         <div className="relative px-4 md:px-6 py-6 md:py-10 max-w-7xl mx-auto">

@@ -6,7 +6,7 @@ import {
   Printer,
   ArrowUpDown,
   Menu,
-  X
+  X,
 } from "lucide-react";
 import InventoryTable from "./InventoryTable";
 import QRModal from "./QRModal";
@@ -78,53 +78,36 @@ export default function InventoryPage() {
   async function onInlineSave(id, patch) {
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
     await new Promise((res) => setTimeout(res, 500));
-    setRows((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, updatedAt: new Date().toISOString() } : r))
-    );
+    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, updatedAt: new Date().toISOString() } : r)));
   }
 
   return (
-    <div className="flex min-h-screen bg-black text-white">
-      {/* Mobile Sidebar */}
-      <div className="lg:hidden p-4">
-        <button onClick={() => setSidebarOpen(true)}>
-          <Menu className="h-6 w-6" />
-        </button>
-      </div>
-
-      {/* Sidebar (desktop & mobile overlay) */}
-      <div
-        className={`fixed inset-y-0 left-0 z-50 transform bg-neutral-900 p-4 transition-transform lg:relative lg:translate-x-0 lg:w-64 w-64
-        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} `}
-      >
-        <div className="flex justify-between items-center mb-4 lg:hidden">
-          <h2 className="text-lg font-bold">Menu</h2>
-          <button onClick={() => setSidebarOpen(false)}>
-            <X className="h-6 w-6" />
-          </button>
-        </div>
-        <Sidebar />
-      </div>
+    <div className="flex min-h-screen text-white flex-col md:flex-row">
+      {/* Sidebar */}
+      {/* <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} /> */}
 
       {/* Main content */}
-      <main className="flex-1 relative overflow-hidden">
-        <header className="sticky top-0 z-40 backdrop-blur border-b border-white/10 bg-neutral-950/60 px-4 py-3 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600" />
-            <span className="text-white font-bold tracking-tight">SmartInventory</span>
-          </div>
-          <div className="text-sm text-neutral-300">Inventory</div>
-        </header>
+      <main className="flex-1 relative overflow-x-hidden">
+        {/* Mobile toggle */}
+        <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-white/10 bg-neutral-900">
+          <button onClick={() => setSidebarOpen(!sidebarOpen)}>
+            {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+          <span className="font-bold text-lg text-white">Inventory</span>
+        </div>
 
         {/* Controls */}
         <section className="relative max-w-7xl mx-auto px-4 py-6">
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4 flex flex-col sm:flex-row sm:flex-wrap gap-3">
             {/* Search */}
-            <div className="flex items-center gap-2 flex-1 min-w-[220px]">
+            <div className="flex items-center gap-2 flex-1 min-w-[180px]">
               <Search className="h-4 w-4 text-neutral-400" />
               <input
                 value={q}
-                onChange={(e) => { setQ(e.target.value); setPage(1); }}
+                onChange={(e) => {
+                  setQ(e.target.value);
+                  setPage(1);
+                }}
                 className="w-full bg-transparent outline-none text-sm placeholder:text-neutral-500"
                 placeholder="Search by SKU or name…"
               />
@@ -135,11 +118,16 @@ export default function InventoryPage() {
               <Filter className="h-4 w-4 text-neutral-400" />
               <select
                 value={category}
-                onChange={(e) => { setCategory(e.target.value); setPage(1); }}
+                onChange={(e) => {
+                  setCategory(e.target.value);
+                  setPage(1);
+                }}
                 className="bg-neutral-900 border border-white/10 rounded-lg px-3 py-1.5 text-sm"
               >
                 {categories.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
                 ))}
               </select>
             </div>
@@ -149,11 +137,16 @@ export default function InventoryPage() {
               <Filter className="h-4 w-4 text-neutral-400" />
               <select
                 value={stockView}
-                onChange={(e) => { setStockView(e.target.value); setPage(1); }}
+                onChange={(e) => {
+                  setStockView(e.target.value);
+                  setPage(1);
+                }}
                 className="bg-neutral-900 border border-white/10 rounded-lg px-3 py-1.5 text-sm"
               >
                 {stockFilters.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
                 ))}
               </select>
             </div>
@@ -171,7 +164,7 @@ export default function InventoryPage() {
           </div>
 
           {/* Table */}
-          <div className="mt-6 rounded-2xl border border-white/10 overflow-x-auto">
+          <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 overflow-x-auto">
             <InventoryTable
               rows={pageRows}
               sortBy={sortBy}
@@ -186,23 +179,24 @@ export default function InventoryPage() {
             <div>
               Showing{" "}
               <span className="text-white">
-                {filtered.length === 0 ? 0 : (page - 1) * pageSize + 1}–
-                {Math.min(page * pageSize, filtered.length)}
+                {filtered.length === 0 ? 0 : (page - 1) * pageSize + 1}–{Math.min(page * pageSize, filtered.length)}
               </span>{" "}
               of <span className="text-white">{filtered.length}</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5"
+                className="px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5 disabled:opacity-50"
                 disabled={page === 1}
               >
                 Prev
               </button>
-              <span className="px-2">{page} / {pageCount}</span>
+              <span className="px-2">
+                {page} / {pageCount}
+              </span>
               <button
                 onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
-                className="px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5"
+                className="px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5 disabled:opacity-50"
                 disabled={page === pageCount}
               >
                 Next

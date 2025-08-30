@@ -185,7 +185,7 @@ function Hero() {
           <p className="mt-5 text-neutral-300 text-lg leading-relaxed">
             Your staff scans QR codes; we handle real-time product data, stock updates, and instant billing — all powered by a blazing MERN stack.
           </p>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+          {/* <div className="mt-8 flex flex-wrap items-center gap-3">
             <motion.button
               whileHover={{ scale: 1.05 }}
               className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-semibold shadow-lg shadow-emerald-500/30 transition"
@@ -198,7 +198,7 @@ function Hero() {
             >
               View API Docs
             </motion.button>
-          </div>
+          </div> */}
           <div className="mt-6 flex items-center gap-6 text-sm text-neutral-400">
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-emerald-400" /> Secure by default
