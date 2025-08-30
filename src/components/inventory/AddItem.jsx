@@ -11,19 +11,54 @@ export default function AddItem() {
     description: "",
   });
 
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("New Item Added:", form);
-    alert("✅ Item Added Successfully!");
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const token = localStorage.getItem("token"); // Assuming JWT is stored here
+
+      const response = await fetch("http://localhost:5000/api/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Protected route
+        },
+        body: JSON.stringify(form),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.error || "Something went wrong");
+      } else {
+        setMessage("✅ Item Added Successfully!");
+        setForm({
+          name: "",
+          category: "",
+          quantity: "",
+          status: "Available",
+          location: "",
+          description: "",
+        });
+      }
+    } catch (err) {
+      setMessage("Error connecting to server");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
       <div className="flex items-center gap-3">
         <PlusCircle className="h-7 w-7 text-emerald-400" />
         <h1 className="text-2xl font-bold text-white tracking-tight">
@@ -31,7 +66,6 @@ export default function AddItem() {
         </h1>
       </div>
 
-      {/* Form Card */}
       <form
         onSubmit={handleSubmit}
         className="bg-neutral-900 border border-white/10 rounded-xl p-6 space-y-6"
@@ -139,12 +173,14 @@ export default function AddItem() {
         </div>
 
         {/* Submit Button */}
-        <div className="flex justify-end">
+        <div className="flex justify-end items-center gap-4">
+          <span className="text-green-400">{message}</span>
           <button
             type="submit"
+            disabled={loading}
             className="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg transition"
           >
-            Add Item
+            {loading ? "Adding..." : "Add Item"}
           </button>
         </div>
       </form>
