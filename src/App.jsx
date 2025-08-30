@@ -21,6 +21,7 @@ import AdminPanel from "./components/pages/AdminPanel";
 import AddItem from "./components/inventory/AddItem";
 import Manageuser from "./components/inventory/Manageuser";
 import SystemSetting from "./components/inventory/SystemSetting";
+import Addorder from "./components/pages/Addorder";
 
 export default function App() {
   return (
@@ -84,6 +85,14 @@ export default function App() {
             element={
               <Layout>
                 <AdminPanel />
+              </Layout>
+            }
+          />
+          <Route
+            path="/add-order"
+            element={
+              <Layout>
+                <Addorder />
               </Layout>
             }
           />
