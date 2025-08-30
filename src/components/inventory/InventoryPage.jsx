@@ -1,213 +1,167 @@
-import React, { useMemo, useState } from "react";
-import {
-  Search,
-  Filter,
-  QrCode,
-  Printer,
-  ArrowUpDown,
-  Menu,
-  X,
-} from "lucide-react";
-import InventoryTable from "./InventoryTable";
-import QRModal from "./QRModal";
-import useDebounce from "../utils/useDebounce";
-import Sidebar from "../Sidebar";
+// src/components/inventory/InventoryPage.jsx
+import React, { useState, useEffect, useMemo } from "react";
+import axios from "axios";
+import { Search } from "lucide-react";
 
-const seed = [
-  { id: 1, sku: "SKU-100001", name: "Organic Oats 1kg", category: "Grocery", price: 4.99, stock: 56, updatedAt: "2025-08-12T10:15:00Z" },
-  { id: 2, sku: "SKU-100002", name: "Almond Milk 1L", category: "Beverages", price: 2.49, stock: 18, updatedAt: "2025-08-13T08:04:00Z" },
-  { id: 3, sku: "SKU-100003", name: "Dark Chocolate 70%", category: "Snacks", price: 1.99, stock: 7, updatedAt: "2025-08-14T09:12:00Z" },
-  { id: 4, sku: "SKU-100004", name: "Olive Oil 500ml", category: "Grocery", price: 6.5, stock: 34, updatedAt: "2025-08-14T18:20:00Z" },
-  { id: 5, sku: "SKU-100005", name: "Protein Bar - Peanut", category: "Snacks", price: 1.25, stock: 0, updatedAt: "2025-08-14T12:30:00Z" },
-  { id: 6, sku: "SKU-100006", name: "Sparkling Water 330ml", category: "Beverages", price: 0.89, stock: 99, updatedAt: "2025-08-11T06:02:00Z" },
-  { id: 7, sku: "SKU-100007", name: "Basmati Rice 5kg", category: "Grocery", price: 12.0, stock: 12, updatedAt: "2025-08-10T16:42:00Z" },
-  { id: 8, sku: "SKU-100008", name: "Trail Mix 250g", category: "Snacks", price: 3.49, stock: 23, updatedAt: "2025-08-09T14:21:00Z" },
-  { id: 9, sku: "SKU-100009", name: "Green Tea 20 bags", category: "Beverages", price: 2.99, stock: 65, updatedAt: "2025-08-08T11:50:00Z" },
-  { id: 10, sku: "SKU-100010", name: "Greek Yogurt 400g", category: "Dairy", price: 2.15, stock: 9, updatedAt: "2025-08-07T09:28:00Z" },
-];
-
-const categories = ["All", "Grocery", "Beverages", "Snacks", "Dairy"];
-const stockFilters = ["All", "In Stock", "Low", "Out"];
-
-export default function InventoryPage() {
-  const [rows, setRows] = useState(seed);
+const InventoryPage = () => {
+  const [rows, setRows] = useState([]);
   const [q, setQ] = useState("");
-  const [category, setCategory] = useState("All");
-  const [stockView, setStockView] = useState("All");
-  const [sortBy, setSortBy] = useState({ key: "updatedAt", dir: "desc" });
-  const [qrItem, setQrItem] = useState(null);
-  const [page, setPage] = useState(1);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [stockFilter, setStockFilter] = useState(""); // e.g., "inStock" or "outOfStock"
+  const [sortBy, setSortBy] = useState({ key: "name", dir: "asc" });
 
-  const pageSize = 8;
-  const debouncedQ = useDebounce(q, 250);
+  // Fetch inventory
+  useEffect(() => {
+    const fetchInventory = async () => {
+      try {
+        const token = localStorage.getItem("token"); // Auth token
+        const res = await axios.get("http://localhost:5000/api/products", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log("Fetched rows:", res.data);
+        setRows(res.data);
+      } catch (err) {
+        console.error("AxiosError", err);
+      }
+    };
+    fetchInventory();
+  }, []);
 
-  const filtered = useMemo(() => {
-    return rows
-      .filter((r) => {
-        if (!debouncedQ) return true;
-        const s = debouncedQ.toLowerCase();
-        return r.sku.toLowerCase().includes(s) || r.name.toLowerCase().includes(s);
-      })
-      .filter((r) => (category === "All" ? true : r.category === category))
-      .filter((r) => {
-        if (stockView === "All") return true;
-        if (stockView === "In Stock") return r.stock > 15;
-        if (stockView === "Low") return r.stock > 0 && r.stock <= 15;
-        if (stockView === "Out") return r.stock === 0;
-        return true;
-      })
-      .sort((a, b) => {
-        const dir = sortBy.dir === "asc" ? 1 : -1;
-        const k = sortBy.key;
-        if (k === "price" || k === "stock") return (a[k] - b[k]) * dir;
-        if (k === "updatedAt") return (new Date(a[k]) - new Date(b[k])) * dir;
-        return String(a[k]).localeCompare(String(b[k])) * dir;
-      });
-  }, [rows, debouncedQ, category, stockView, sortBy]);
+  // Filter + sort rows
+  const filteredRows = useMemo(() => {
+    let data = [...rows];
 
-  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const pageRows = filtered.slice((page - 1) * pageSize, page * pageSize);
+    // Search
+    if (q) {
+      data = data.filter(
+        (row) =>
+          row.name.toLowerCase().includes(q.toLowerCase()) ||
+          row.sku.toLowerCase().includes(q.toLowerCase())
+      );
+    }
 
-  function toggleSort(key) {
+    // Category filter
+    if (categoryFilter) {
+      data = data.filter((row) => row.category === categoryFilter);
+    }
+
+    // Stock filter
+    if (stockFilter) {
+      if (stockFilter === "inStock") data = data.filter((row) => row.stock > 0);
+      if (stockFilter === "outOfStock") data = data.filter((row) => row.stock === 0);
+    }
+
+    // Sorting
+    data.sort((a, b) => {
+      const aValue = a[sortBy.key];
+      const bValue = b[sortBy.key];
+
+      if (aValue < bValue) return sortBy.dir === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortBy.dir === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    return data;
+  }, [rows, q, categoryFilter, stockFilter, sortBy]);
+
+  const toggleSort = (key) =>
     setSortBy((prev) =>
       prev.key === key ? { key, dir: prev.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" }
     );
-  }
-
-  async function onInlineSave(id, patch) {
-    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
-    await new Promise((res) => setTimeout(res, 500));
-    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, updatedAt: new Date().toISOString() } : r)));
-  }
 
   return (
-    <div className="flex min-h-screen text-white flex-col md:flex-row">
-      {/* Sidebar */}
-      {/* <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} /> */}
+    <div className="min-h-screen p-6 bg-neutral-900 text-white flex flex-col gap-6">
+      <h1 className="text-2xl font-bold">Inventory</h1>
 
-      {/* Main content */}
-      <main className="flex-1 relative overflow-x-hidden">
-        {/* Mobile toggle */}
-        <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-white/10 bg-neutral-900">
-          <button onClick={() => setSidebarOpen(!sidebarOpen)}>
-            {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-          <span className="font-bold text-lg text-white">Inventory</span>
+      {/* Filters & Search */}
+      <div className="flex flex-wrap gap-3 items-center">
+        <div className="flex items-center gap-2">
+          <Search className="h-4 w-4 text-neutral-400" />
+          <input
+            placeholder="Search SKU or name"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            className="px-3 py-2 rounded-lg bg-neutral-800 text-white text-sm outline-none"
+          />
         </div>
 
-        {/* Controls */}
-        <section className="relative max-w-7xl mx-auto px-4 py-6">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 flex flex-col sm:flex-row sm:flex-wrap gap-3">
-            {/* Search */}
-            <div className="flex items-center gap-2 flex-1 min-w-[180px]">
-              <Search className="h-4 w-4 text-neutral-400" />
-              <input
-                value={q}
-                onChange={(e) => {
-                  setQ(e.target.value);
-                  setPage(1);
-                }}
-                className="w-full bg-transparent outline-none text-sm placeholder:text-neutral-500"
-                placeholder="Search by SKU or name…"
-              />
-            </div>
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="px-3 py-2 rounded-lg bg-neutral-800 text-white text-sm outline-none"
+        >
+          <option value="">All Categories</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Food">Food</option>
+          <option value="Clothing">Clothing</option>
+        </select>
 
-            {/* Category filter */}
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-neutral-400" />
-              <select
-                value={category}
-                onChange={(e) => {
-                  setCategory(e.target.value);
-                  setPage(1);
-                }}
-                className="bg-neutral-900 border border-white/10 rounded-lg px-3 py-1.5 text-sm"
+        <select
+          value={stockFilter}
+          onChange={(e) => setStockFilter(e.target.value)}
+          className="px-3 py-2 rounded-lg bg-neutral-800 text-white text-sm outline-none"
+        >
+          <option value="">All Stock</option>
+          <option value="inStock">In Stock</option>
+          <option value="outOfStock">Out of Stock</option>
+        </select>
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full table-auto border border-neutral-700">
+          <thead>
+            <tr>
+              <th
+                className="px-4 py-2 cursor-pointer"
+                onClick={() => toggleSort("name")}
               >
-                {categories.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Stock filter */}
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-neutral-400" />
-              <select
-                value={stockView}
-                onChange={(e) => {
-                  setStockView(e.target.value);
-                  setPage(1);
-                }}
-                className="bg-neutral-900 border border-white/10 rounded-lg px-3 py-1.5 text-sm"
+                Name
+              </th>
+              <th
+                className="px-4 py-2 cursor-pointer"
+                onClick={() => toggleSort("category")}
               >
-                {stockFilters.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Sort */}
-            <div className="sm:ml-auto flex items-center gap-2">
-              <button
-                onClick={() => toggleSort("updatedAt")}
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5 text-sm"
+                Category
+              </th>
+              <th
+                className="px-4 py-2 cursor-pointer"
+                onClick={() => toggleSort("sku")}
               >
-                <ArrowUpDown className="h-4 w-4" />
-                Updated
-              </button>
-            </div>
-          </div>
-
-          {/* Table */}
-          <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 overflow-x-auto">
-            <InventoryTable
-              rows={pageRows}
-              sortBy={sortBy}
-              onSort={toggleSort}
-              onEdit={onInlineSave}
-              onShowQR={(item) => setQrItem(item)}
-            />
-          </div>
-
-          {/* Pagination */}
-          <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between text-sm text-neutral-400 gap-3">
-            <div>
-              Showing{" "}
-              <span className="text-white">
-                {filtered.length === 0 ? 0 : (page - 1) * pageSize + 1}–{Math.min(page * pageSize, filtered.length)}
-              </span>{" "}
-              of <span className="text-white">{filtered.length}</span>
-            </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5 disabled:opacity-50"
-                disabled={page === 1}
+                SKU
+              </th>
+              <th>Description</th>
+              <th
+                className="px-4 py-2 cursor-pointer"
+                onClick={() => toggleSort("stock")}
               >
-                Prev
-              </button>
-              <span className="px-2">
-                {page} / {pageCount}
-              </span>
-              <button
-                onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
-                className="px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5 disabled:opacity-50"
-                disabled={page === pageCount}
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* QR Modal */}
-        {qrItem && <QRModal item={qrItem} onClose={() => setQrItem(null)} />}
-      </main>
+                Stock
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredRows.length > 0 ? (
+              filteredRows.map((row) => (
+                <tr key={row._id} className="border-t border-neutral-700">
+                  <td className="px-4 py-2">{row.name}</td>
+                  <td className="px-4 py-2">{row.category}</td>
+                  <td className="px-4 py-2">{row.sku}</td>
+                  <td className="px-4 py-2">{row.description}</td>
+                  <td className="px-4 py-2">{row.stock}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="px-4 py-2 text-center text-neutral-400">
+                  No items found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
-}
+};
+
+export default InventoryPage;

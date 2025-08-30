@@ -13,6 +13,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   const navigate = useNavigate();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  // Get current user from localStorage
   const currentUser = JSON.parse(localStorage.getItem("user")) || { role: "Guest" };
 
   const handleLogout = () => {
@@ -45,40 +46,21 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-          <NavLink
-            to="/dashboard"
-            className={navLinkClasses}
-            onClick={() => setIsOpen(false)}
-          >
+          <NavLink to="/dashboard" className={navLinkClasses} onClick={() => setIsOpen(false)}>
             <LayoutDashboard className="h-5 w-5" /> Dashboard
           </NavLink>
-          <NavLink
-            to="/inventory"
-            className={navLinkClasses}
-            onClick={() => setIsOpen(false)}
-          >
+          <NavLink to="/inventory" className={navLinkClasses} onClick={() => setIsOpen(false)}>
             <Boxes className="h-5 w-5" /> Inventory
           </NavLink>
-          <NavLink
-            to="/reports"
-            className={navLinkClasses}
-            onClick={() => setIsOpen(false)}
-          >
+          <NavLink to="/reports" className={navLinkClasses} onClick={() => setIsOpen(false)}>
             <FileText className="h-5 w-5" /> Reports
           </NavLink>
-          <NavLink
-            to="/orders"
-            className={navLinkClasses}
-            onClick={() => setIsOpen(false)}
-          >
+          <NavLink to="/orders" className={navLinkClasses} onClick={() => setIsOpen(false)}>
             <ClipboardList className="h-5 w-5" /> Orders
           </NavLink>
-          {currentUser.role === "Admin" && (
-            <NavLink
-              to="/admin-panel"
-              className={navLinkClasses}
-              onClick={() => setIsOpen(false)}
-            >
+          {/* Admin Panel visible only for Admin */}
+          {currentUser.role === "admin" && (
+            <NavLink to="/admin-panel" className={navLinkClasses} onClick={() => setIsOpen(false)}>
               <Shield className="h-5 w-5" /> Admin Panel
             </NavLink>
           )}

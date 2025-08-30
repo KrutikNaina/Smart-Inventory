@@ -14,25 +14,34 @@ export default function AddItem() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
+  // Handle input change
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
 
     try {
-      const token = localStorage.getItem("token"); // Assuming JWT is stored here
+      const token = localStorage.getItem("token"); // JWT token from login
+      if (!token) throw new Error("You are not logged in.");
+
+      // Prepare payload for backend
+      const payload = {
+        ...form,
+        quantity: Number(form.quantity), // ensure number type
+      };
 
       const response = await fetch("http://localhost:5000/api/products", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Protected route
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -51,7 +60,8 @@ export default function AddItem() {
         });
       }
     } catch (err) {
-      setMessage("Error connecting to server");
+      console.error(err);
+      setMessage(err.message || "Error connecting to server");
     } finally {
       setLoading(false);
     }
