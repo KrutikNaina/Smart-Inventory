@@ -1,10 +1,61 @@
-import React from "react";
-import LoginCard from "../components/auth/LoginCard";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FcGoogle } from "react-icons/fc";
 
-export default function Login() {
+
+const Login = () => {
+  const [warning, setWarning] = useState("");
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const listener = (event) => {
+      const allowedOrigins = ["http://localhost:5000", "http://localhost:5173"];
+      if (!allowedOrigins.includes(event.origin)) return;
+
+      if (event.data?.type === "oauth-success") {
+        const token = event.data.token;
+
+        if (token) {
+          localStorage.setItem("token", token);
+
+          // decode token payload
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          setUser(payload);
+
+          navigate("/dashboard"); // redirect after login
+        } else {
+          setWarning("Token missing in OAuth response.");
+        }
+      }
+
+      window.removeEventListener("message", listener);
+    };
+
+    window.addEventListener("message", listener);
+    return () => window.removeEventListener("message", listener);
+  }, [navigate]);
+
+  const openPopup = (url) => {
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+
+    window.open(
+      url,
+      "GoogleAuth",
+      `width=${width},height=${height},left=${left},top=${top}`
+    );
+  };
+
+  const handleGoogleLogin = () => {
+    openPopup("http://localhost:5000/auth/google");
+  };
+
   return (
     <main className="min-h-screen bg-neutral-950 text-white">
-      {/* sticky header like your site */}
+      {/* sticky header */}
       <header className="sticky top-0 z-40 backdrop-blur border-b border-white/10 bg-neutral-950/60">
         <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -17,10 +68,10 @@ export default function Login() {
         </nav>
       </header>
 
-      {/* center area */}
+      {/* center section */}
       <section className="max-w-7xl mx-auto px-6 py-16 flex items-center justify-center">
         <div className="w-full grid lg:grid-cols-2 gap-10 items-center">
-          {/* left: pitch */}
+          {/* left side info */}
           <div className="hidden lg:block">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/15 text-xs text-neutral-300">
               Secure • Fast • Role-based
@@ -39,10 +90,36 @@ export default function Login() {
             </ul>
           </div>
 
-          {/* right: card */}
-          <LoginCard onGoogle={() => Promise.resolve()} />
+          {/* right side card */}
+          <div className="p-8 bg-neutral-900 border border-white/10 rounded-2xl shadow-lg">
+            <h2 className="text-2xl font-bold text-center mb-6">
+              Sign in with Google
+            </h2>
+
+            <button
+              onClick={handleGoogleLogin}
+              className="w-full flex items-center justify-center gap-3 bg-white text-black py-3 px-4 rounded-lg hover:bg-gray-100 transition"
+            >
+              <FcGoogle size={20} />
+              <span>Continue with Google</span>
+            </button>
+
+            {user && (
+              <div className="mt-4 text-sm text-green-400 text-center">
+                ✅ Welcome, {user.name} ({user.email})
+              </div>
+            )}
+
+            {warning && (
+              <div className="mt-4 text-sm text-yellow-400 text-center">
+                ⚠️ {warning}
+              </div>
+            )}
+          </div>
         </div>
       </section>
     </main>
   );
-}
+};
+
+export default Login;
