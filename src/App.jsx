@@ -11,17 +11,23 @@ import KPIBar from "./components/KPIBar";
 import Footer from "./components/Footer";
 
 import Login from "./components/Login";
+import Layout from "./components/layout"; // 👈 import Layout
 import Dashboard from "./components/pages/Dashboard";
 import InventoryPage from "./components/inventory/InventoryPage";
 import Orders from "./components/pages/Orders";
 import AdminSettings from "./components/pages/AdminSettings";
+import Reports from "./components/pages/Reports";
+import AdminPanel from "./components/pages/AdminPanel";
+import AddItem from "./components/inventory/AddItem";
+import Manageuser from "./components/inventory/Manageuser";
+import SystemSetting from "./components/inventory/SystemSetting";
 
 export default function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-neutral-950 text-white">
         <Routes>
-          {/* Landing */}
+          {/* Public Landing Page */}
           <Route
             path="/"
             element={
@@ -36,14 +42,75 @@ export default function App() {
               </>
             }
           />
+
+          {/* Auth */}
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
 
-          {/* NEW: Inventory Page */}
-          <Route path="/inventory" element={<InventoryPage />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/admin-setting" element={<AdminSettings />} />
-
+          {/* Protected / Internal Pages with Layout */}
+          <Route
+            path="/dashboard"
+            element={
+              <Layout>
+                <Dashboard />
+              </Layout>
+            }
+          />
+          <Route
+            path="/inventory"
+            element={
+              <Layout>
+                <InventoryPage />
+              </Layout>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <Layout>
+                <Orders />
+              </Layout>
+            }
+          />
+          <Route
+            path="/reports"
+            element={
+              <Layout>
+                <Reports />
+              </Layout>
+            }
+          />
+          <Route
+            path="/admin-panel"
+            element={
+              <Layout>
+                <AdminPanel />
+              </Layout>
+            }
+          />
+          <Route
+            path="/add-item"
+            element={
+              <Layout>
+                <AddItem />
+              </Layout>
+            }
+          />
+          <Route
+            path="/manage-users"
+            element={
+              <Layout>
+                <Manageuser />
+              </Layout>
+            }
+          /> <Route
+            path="/settings"
+            element={
+              <Layout>
+                <SystemSetting />
+              </Layout>
+            }
+          />
+          
         </Routes>
       </div>
     </BrowserRouter>

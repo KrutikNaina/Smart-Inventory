@@ -25,9 +25,14 @@ export default function LoginCard({ onGoogle = () => {} }) {
         p-6 sm:p-8 text-white"
     >
       <div className="flex items-center gap-3">
-        <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600" />
+        <div className="flex items-center gap-2">
+          <div className="h-8 w-8 flex items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600 text-white font-bold text-lg">
+            S
+          </div>
+        </div>
+
         <div>
-          <h2 className="font-semibold leading-tight">SmartInventory</h2>
+          <h2 className="font-semibold leading-tight">Scanventory</h2>
           <p className="text-xs text-neutral-400">Log in to your dashboard</p>
         </div>
       </div>
